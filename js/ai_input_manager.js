@@ -143,9 +143,6 @@ AIInputManager.prototype.nextMove = async function() {
   if (!this.ai)
     this.setAIMode(this.mode);
   var move = await this.ai.nextMove();
-
-  console.log('move: ' + move);
-
   this.emit("move", move);
 
   // If the game is over, do a longer wait and start again.

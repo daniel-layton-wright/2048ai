@@ -14,7 +14,6 @@ NNAI.prototype.nextMove = async function() {
     output = await this.session.run([tensor]);
     var outputTensor = output.values().next().value;
     var outputArray = Array.from(outputTensor.data);
-    console.log('Output: ' + outputArray);
     var maxIndex = outputArray.indexOf(Math.max(...outputArray));
     var direction = maxIndex % 4;
 
