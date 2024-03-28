@@ -3,12 +3,12 @@ function AIInputManager() {
   this.listen();
 }
 
-AIMode = { RNG: 0, PRIORITY: 1, ALGORITHM: 2, SMART: 3 };
+AIMode = { RNG: 0, PRIORITY: 1, ALGORITHM: 2, SMART: 3, NN: 4};
 AISpeed = { FULL: 0, FAST: 1, SLOW: 2 };
 TileGenerator = { RANDOM: 0, EVIL: 1 };
 
 AIInputManager.prototype.runningAI = false;
-AIInputManager.prototype.mode = AIMode.SMART;
+AIInputManager.prototype.mode = AIMode.NN;
 AIInputManager.prototype.speed = AISpeed.FAST;
 AIInputManager.prototype.tileGenerator = TileGenerator.RANDOM;
 AIInputManager.prototype.fastMoveTime = 200; // milliseconds
@@ -39,6 +39,7 @@ AIInputManager.prototype.listen = function () {
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".pause-button", this.pauseOrResume);
   this.bindButtonPress(".smart-ai-button", function() { this.setAIMode(AIMode.SMART); });
+  this.bindButtonPress(".nn-ai-button", function() { this.setAIMode(AIMode.NN); });
   this.bindButtonPress(".algorithm-ai-button", function() { this.setAIMode(AIMode.ALGORITHM); });
   this.bindButtonPress(".priority-ai-button", function() { this.setAIMode(AIMode.PRIORITY); });
   this.bindButtonPress(".rng-ai-button", function() { this.setAIMode(AIMode.RNG); });
@@ -110,6 +111,9 @@ AIInputManager.prototype.setAIMode = function(mode) {
     case AIMode.SMART:
       this.ai = new SmartAI(this.game);
       break;
+    case AIMode.NN:
+      this.ai = new NNAI(this.game);
+      break;
   }
 }
 
@@ -134,11 +138,14 @@ AIInputManager.prototype.setTileGenerator = function(gen) {
   }
 }
 
-AIInputManager.prototype.nextMove = function() {
+AIInputManager.prototype.nextMove = async function() {
   var self = this;
   if (!this.ai)
     this.setAIMode(this.mode);
-  var move = this.ai.nextMove();
+  var move = await this.ai.nextMove();
+
+  console.log('move: ' + move);
+
   this.emit("move", move);
 
   // If the game is over, do a longer wait and start again.
